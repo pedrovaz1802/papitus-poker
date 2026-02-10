@@ -178,23 +178,24 @@ ul.appendChild(li);
 }
 
 // PARTIDAS
-const startDate = new Date(2025,10,3); // 09/02/2026
-let data = JSON.parse(localStorage.getItem('pokerData')) || {};
-const select = document.getElementById('dateFilter');
-const gamesDiv = document.getElementById('games');
-
-function formatDate(d){ return d.toLocaleDateString('pt-BR'); }
+const startDate = new Date(2025,10,3); // 03/11/2025
+const endDate   = new Date(2026,11,31); // 31/12/2026
 
 let d = new Date(startDate);
-while(d.getFullYear() === 2026){
-const key = d.toISOString().split('T')[0];
-if(!data[key]) data[key] = [{},{},{}];
-const opt = document.createElement('option');
-opt.value = key;
-opt.textContent = formatDate(d);
-select.appendChild(opt);
-d.setDate(d.getDate()+7);
+
+while(d <= endDate){
+  const key = d.toISOString().split('T')[0];
+
+  if(!data[key]) data[key] = [{},{},{}];
+
+  const opt = document.createElement('option');
+  opt.value = key;
+  opt.textContent = formatDate(d);
+  select.appendChild(opt);
+
+  d.setDate(d.getDate() + 7);
 }
+
 localStorage.setItem('pokerData',JSON.stringify(data));
 
 select.onchange = renderGames;
