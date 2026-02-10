@@ -176,6 +176,15 @@ li.textContent=n;
 ul.appendChild(li);
 });
 }
+// ELEMENTOS E DADOS (OBRIGATÓRIO)
+const select = document.getElementById('dateFilter');
+const gamesDiv = document.getElementById('games');
+
+function formatDate(d){
+  return d.toLocaleDateString('pt-BR');
+}
+
+let data = JSON.parse(localStorage.getItem('pokerData')) || {};
 
 // PARTIDAS
 const startDate = new Date(2025,10,3); // 03/11/2025
