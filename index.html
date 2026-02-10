@@ -77,12 +77,14 @@ if (typeof renderPlayers === "function") renderPlayers();
 
 // PARTIDAS
 db.ref("pokerData").on("value", snap => {
+  if (isTyping) return; // 🚫 impede bug ao digitar
+
   data = snap.val() || {};
   localStorage.setItem("pokerData", JSON.stringify(data));
+
   if (typeof renderGames === "function") renderGames();
   if (typeof renderRanking === "function") renderRanking();
 });
-
 // OVERRIDES
 const _setItem = localStorage.setItem;
 localStorage.setItem = function(key, value) {
@@ -145,6 +147,7 @@ if (key === "pokerData") db.ref("pokerData").set(parsed);
 </div>
 
 <script>
+  let isTyping = false;
 // navegação
 const pages = document.querySelectorAll('.page');
 function showPage(id){
@@ -264,9 +267,16 @@ gamesDiv.appendChild(div);
 });
 }
 
-function save(day,i,type,value){
-data[day][i][type]=value;
-localStorage.setItem('pokerData',JSON.stringify(data));
+function save(day, i, type, value){
+  isTyping = true;
+
+  data[day][i][type] = value;
+  localStorage.setItem('pokerData', JSON.stringify(data));
+
+  clearTimeout(window.typingTimer);
+  window.typingTimer = setTimeout(() => {
+    isTyping = false;
+  }, 600);
 }
 
 // RANKING
