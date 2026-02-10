@@ -42,6 +42,59 @@
   </style>
 </head>
 <body>
+  <!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDtKANEWJbr2clBa0r1Nhuix3r_QX_85Ik",
+    authDomain: "papitus-poker-a98bd.firebaseapp.com",
+    databaseURL: "https://papitus-poker-a98bd-default-rtdb.firebaseio.com",
+    projectId: "papitus-poker-a98bd",
+    storageBucket: "papitus-poker-a98bd.appspot.com",
+    messagingSenderId: "939981591366",
+    appId: "1:939981591366:web:606dae84c8c257aee04b47"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
+
+<script>
+/* ====== SINCRONIZAÇÃO FIREBASE ↔ SITE ====== */
+
+// PARTICIPANTES
+db.ref("players").on("value", snap => {
+  const players = snap.val() || [];
+  localStorage.setItem("players", JSON.stringify(players));
+  if (document.getElementById("playersList")) renderPlayers();
+});
+
+// PARTIDAS
+db.ref("pokerData").on("value", snap => {
+  const data = snap.val() || {};
+  localStorage.setItem("pokerData", JSON.stringify(data));
+  if (document.getElementById("games")) renderGames();
+});
+
+// OVERRIDES (sem mudar sua lógica)
+const _setItem = localStorage.setItem;
+localStorage.setItem = function(key, value) {
+  _setItem.apply(this, arguments);
+
+  try {
+    const parsed = JSON.parse(value);
+    if (key === "players") {
+      db.ref("players").set(parsed);
+    }
+    if (key === "pokerData") {
+      db.ref("pokerData").set(parsed);
+    }
+  } catch (e) {}
+};
+</script>
+
 
 <nav>
   <a onclick="showPage('inicio')">INÍCIO</a>
