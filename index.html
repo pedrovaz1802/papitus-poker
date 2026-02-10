@@ -77,9 +77,10 @@ if (typeof renderPlayers === "function") renderPlayers();
 
 // PARTIDAS
 db.ref("pokerData").on("value", snap => {
-const dataFB = snap.val() || {};
-localStorage.setItem("pokerData", JSON.stringify(dataFB));
-if (typeof renderGames === "function") renderGames();
+  data = snap.val() || {};
+  localStorage.setItem("pokerData", JSON.stringify(data));
+  if (typeof renderGames === "function") renderGames();
+  if (typeof renderRanking === "function") renderRanking();
 });
 
 // OVERRIDES
@@ -256,3 +257,4 @@ document.getElementById('rankVices').appendChild(li);
 
 </body>
 </html>
+
