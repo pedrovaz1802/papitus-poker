@@ -167,14 +167,42 @@ alert('Jogador adicionado!');
 }
 
 function renderPlayers(){
-const players = JSON.parse(localStorage.getItem('players')) || [];
-const ul=document.getElementById('playersList');
-ul.innerHTML='';
-players.forEach(n=>{
-const li=document.createElement('li');
-li.textContent=n;
-ul.appendChild(li);
-});
+  const players = JSON.parse(localStorage.getItem('players')) || [];
+  const ul = document.getElementById('playersList');
+  ul.innerHTML = '';
+
+  players.forEach((name, index) => {
+    const li = document.createElement('li');
+    li.style.marginBottom = '10px';
+
+    li.innerHTML = `
+      <strong>${name}</strong>
+      <button onclick="editPlayer(${index})">✏️ Editar</button>
+      <button onclick="removePlayer(${index})">🗑️ Remover</button>
+    `;
+
+    ul.appendChild(li);
+  });
+}
+
+function editPlayer(index){
+  let players = JSON.parse(localStorage.getItem('players')) || [];
+  const newName = prompt('Digite o novo nome do participante:', players[index]);
+
+  if(newName && newName.trim()){
+    players[index] = newName.trim();
+    localStorage.setItem('players', JSON.stringify(players));
+    renderPlayers();
+  }
+}
+
+function removePlayer(index){
+  if(!confirm('Tem certeza que deseja remover este participante?')) return;
+
+  let players = JSON.parse(localStorage.getItem('players')) || [];
+  players.splice(index, 1);
+  localStorage.setItem('players', JSON.stringify(players));
+  renderPlayers();
 }
 // ELEMENTOS E DADOS (OBRIGATÓRIO)
 const select = document.getElementById('dateFilter');
