@@ -62,7 +62,39 @@
 </script>
 
 <script>
-/* ====== SINCRONIZAÇÃO FIREBASE ↔ SITE ====== */
+window.addEventListener("load", () => {
+
+  /* ====== SINCRONIZAÇÃO FIREBASE ↔ SITE ====== */
+
+  // PARTICIPANTES
+  db.ref("players").on("value", snap => {
+    const players = snap.val() || [];
+    localStorage.setItem("players", JSON.stringify(players));
+    if (typeof renderPlayers === "function") renderPlayers();
+  });
+
+  // PARTIDAS
+  db.ref("pokerData").on("value", snap => {
+    const dataFB = snap.val() || {};
+    localStorage.setItem("pokerData", JSON.stringify(dataFB));
+    if (typeof renderGames === "function") renderGames();
+  });
+
+  // OVERRIDES
+  const _setItem = localStorage.setItem;
+  localStorage.setItem = function(key, value) {
+    _setItem.apply(this, arguments);
+
+    try {
+      const parsed = JSON.parse(value);
+      if (key === "players") db.ref("players").set(parsed);
+      if (key === "pokerData") db.ref("pokerData").set(parsed);
+    } catch (e) {}
+  };
+
+});
+</script>
+
 
 // PARTICIPANTES
 db.ref("players").on("value", snap => {
