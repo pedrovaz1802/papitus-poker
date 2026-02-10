@@ -1,210 +1,179 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Papitu´s Poker</title>
-  <style>
-    body {
-      font-family: 'Trebuchet MS', Arial, sans-serif;
-      background: radial-gradient(circle at center, #1f7a4d 0%, #0b3d2e 70%);
-      color:#fff; margin:0;
-    }
-    nav {
-      background:#06261d;
-      padding:12px;
-      display:flex;
-      gap:30px;
-      justify-content:center;
-      box-shadow:0 2px 10px rgba(0,0,0,.5);
-    }
-    nav a { color:#f5e6b8; text-decoration:none; font-weight:bold; cursor:pointer; }
-    .page { display:none; padding:30px; }
-    .active { display:block; }
-    h1 { text-align:center; margin-bottom:20px; letter-spacing:2px; }
-    .suits { display:flex; justify-content:space-between; font-size:42px; color:#f5e6b8; }
-    .center-box { display:flex; justify-content:center; margin-top:30px; }
-    input, select, button {
-      padding:10px; margin:5px;
-      border-radius:6px;
-      border:none;
-    }
-    button { cursor:pointer; background:#ffd966; font-weight:bold; }
-    .table {
-      background:rgba(0,0,0,.35);
-      border-radius:16px;
-      padding:20px;
-      box-shadow:inset 0 0 20px rgba(0,0,0,.6);
-      max-width:800px;
-      margin:0 auto;
-    }
-    .day { border:1px solid rgba(255,255,255,.3); padding:15px; margin-top:15px; border-radius:12px; }
-    strong { color:#ffd966; }
-  </style>
+<meta charset="UTF-8" />
+<title>Papitu´s Poker</title>
+<style>
+body {
+font-family: 'Trebuchet MS', Arial, sans-serif;
+background: radial-gradient(circle at center, #1f7a4d 0%, #0b3d2e 70%);
+color:#fff; margin:0;
+}
+nav {
+background:#06261d;
+padding:12px;
+display:flex;
+gap:30px;
+justify-content:center;
+box-shadow:0 2px 10px rgba(0,0,0,.5);
+}
+nav a { color:#f5e6b8; text-decoration:none; font-weight:bold; cursor:pointer; }
+.page { display:none; padding:30px; }
+.active { display:block; }
+h1 { text-align:center; margin-bottom:20px; letter-spacing:2px; }
+.suits { display:flex; justify-content:space-between; font-size:42px; color:#f5e6b8; }
+.center-box { display:flex; justify-content:center; margin-top:30px; }
+input, select, button {
+padding:10px; margin:5px;
+border-radius:6px;
+border:none;
+}
+button { cursor:pointer; background:#ffd966; font-weight:bold; }
+.table {
+background:rgba(0,0,0,.35);
+border-radius:16px;
+padding:20px;
+box-shadow:inset 0 0 20px rgba(0,0,0,.6);
+max-width:800px;
+margin:0 auto;
+}
+.day { border:1px solid rgba(255,255,255,.3); padding:15px; margin-top:15px; border-radius:12px; }
+strong { color:#ffd966; }
+</style>
 </head>
+
 <body>
-  <!-- FIREBASE -->
+
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyDtKANEWJbr2clBa0r1Nhuix3r_QX_85Ik",
-    authDomain: "papitus-poker-a98bd.firebaseapp.com",
-    databaseURL: "https://papitus-poker-a98bd-default-rtdb.firebaseio.com",
-    projectId: "papitus-poker-a98bd",
-    storageBucket: "papitus-poker-a98bd.appspot.com",
-    messagingSenderId: "939981591366",
-    appId: "1:939981591366:web:606dae84c8c257aee04b47"
-  };
+const firebaseConfig = {
+apiKey: "AIzaSyDtKANEWJbr2clBa0r1Nhuix3r_QX_85Ik",
+authDomain: "papitus-poker-a98bd.firebaseapp.com",
+databaseURL: "https://papitus-poker-a98bd-default-rtdb.firebaseio.com",
+projectId: "papitus-poker-a98bd",
+storageBucket: "papitus-poker-a98bd.appspot.com",
+messagingSenderId: "939981591366",
+appId: "1:939981591366:web:606dae84c8c257aee04b47"
+};
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 </script>
 
 <script>
 window.addEventListener("load", () => {
 
-  /* ====== SINCRONIZAÇÃO FIREBASE ↔ SITE ====== */
-
-  // PARTICIPANTES
-  db.ref("players").on("value", snap => {
-    const players = snap.val() || [];
-    localStorage.setItem("players", JSON.stringify(players));
-    if (typeof renderPlayers === "function") renderPlayers();
-  });
-
-  // PARTIDAS
-  db.ref("pokerData").on("value", snap => {
-    const dataFB = snap.val() || {};
-    localStorage.setItem("pokerData", JSON.stringify(dataFB));
-    if (typeof renderGames === "function") renderGames();
-  });
-
-  // OVERRIDES
-  const _setItem = localStorage.setItem;
-  localStorage.setItem = function(key, value) {
-    _setItem.apply(this, arguments);
-
-    try {
-      const parsed = JSON.parse(value);
-      if (key === "players") db.ref("players").set(parsed);
-      if (key === "pokerData") db.ref("pokerData").set(parsed);
-    } catch (e) {}
-  };
-
-});
-</script>
-
+/* ====== SINCRONIZAÇÃO FIREBASE ↔ SITE ====== */
 
 // PARTICIPANTES
 db.ref("players").on("value", snap => {
-  const players = snap.val() || [];
-  localStorage.setItem("players", JSON.stringify(players));
-  if (document.getElementById("playersList")) renderPlayers();
+const players = snap.val() || [];
+localStorage.setItem("players", JSON.stringify(players));
+if (typeof renderPlayers === "function") renderPlayers();
 });
 
 // PARTIDAS
 db.ref("pokerData").on("value", snap => {
-  const data = snap.val() || {};
-  localStorage.setItem("pokerData", JSON.stringify(data));
-  if (document.getElementById("games")) renderGames();
+const dataFB = snap.val() || {};
+localStorage.setItem("pokerData", JSON.stringify(dataFB));
+if (typeof renderGames === "function") renderGames();
 });
 
-// OVERRIDES (sem mudar sua lógica)
+// OVERRIDES
 const _setItem = localStorage.setItem;
 localStorage.setItem = function(key, value) {
-  _setItem.apply(this, arguments);
+_setItem.apply(this, arguments);
 
-  try {
-    const parsed = JSON.parse(value);
-    if (key === "players") {
-      db.ref("players").set(parsed);
-    }
-    if (key === "pokerData") {
-      db.ref("pokerData").set(parsed);
-    }
-  } catch (e) {}
+try {
+const parsed = JSON.parse(value);
+if (key === "players") db.ref("players").set(parsed);
+if (key === "pokerData") db.ref("pokerData").set(parsed);
+} catch (e) {}
 };
+
+});
 </script>
 
-
 <nav>
-  <a onclick="showPage('inicio')">INÍCIO</a>
-  <a onclick="showPage('partidas')">PARTIDAS</a>
-  <a onclick="showPage('participantes')">PARTICIPANTES</a>
-  <a onclick="showPage('ranking')">RANKING</a>
+<a onclick="showPage('inicio')">INÍCIO</a>
+<a onclick="showPage('partidas')">PARTIDAS</a>
+<a onclick="showPage('participantes')">PARTICIPANTES</a>
+<a onclick="showPage('ranking')">RANKING</a>
 </nav>
 
 <!-- INÍCIO -->
 <div id="inicio" class="page active">
-  <div class="suits">♠ ♥ <span></span> ♦ ♣</div>
-  <h1>PAPITU´S POKER</h1>
-  <div class="center-box">
-    <input id="playerInput" placeholder="Nome (digite seu nome)" />
-    <button onclick="addPlayer()">Adicionar</button>
-  </div>
+<div class="suits">♠ ♥ <span></span> ♦ ♣</div>
+<h1>PAPITU´S POKER</h1>
+<div class="center-box">
+<input id="playerInput" placeholder="Nome (digite seu nome)" />
+<button onclick="addPlayer()">Adicionar</button>
+</div>
 </div>
 
 <!-- PARTIDAS -->
 <div id="partidas" class="page">
-  <h1>PARTIDAS</h1>
-  <div class="table">
-    <label>Escolha a data:</label>
-    <select id="dateFilter"></select>
-    <div id="games"></div>
-  </div>
+<h1>PARTIDAS</h1>
+<div class="table">
+<label>Escolha a data:</label>
+<select id="dateFilter"></select>
+<div id="games"></div>
+</div>
 </div>
 
 <!-- PARTICIPANTES -->
 <div id="participantes" class="page">
-  <h1>PARTICIPANTES</h1>
-  <div class="table">
-    <ul id="playersList"></ul>
-  </div>
+<h1>PARTICIPANTES</h1>
+<div class="table">
+<ul id="playersList"></ul>
+</div>
 </div>
 
 <!-- RANKING -->
 <div id="ranking" class="page">
-  <h1>RANKING DE LÍDERES</h1>
-  <div class="table">
-    <h3>🏆 Mais Vitórias</h3>
-    <ol id="rankWins"></ol>
-    <h3>🥈 Mais Vices</h3>
-    <ol id="rankVices"></ol>
-  </div>
+<h1>RANKING DE LÍDERES</h1>
+<div class="table">
+<h3>🏆 Mais Vitórias</h3>
+<ol id="rankWins"></ol>
+<h3>🥈 Mais Vices</h3>
+<ol id="rankVices"></ol>
+</div>
 </div>
 
 <script>
 // navegação
 const pages = document.querySelectorAll('.page');
 function showPage(id){
-  pages.forEach(p=>p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if(id==='participantes') renderPlayers();
-  if(id==='ranking') renderRanking();
+pages.forEach(p=>p.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+if(id==='participantes') renderPlayers();
+if(id==='ranking') renderRanking();
 }
 
 // PARTICIPANTES
 function addPlayer(){
-  const input = document.getElementById('playerInput');
-  const name = input.value.trim();
-  if(!name) return;
-  let players = JSON.parse(localStorage.getItem('players')) || [];
-  if(!players.includes(name)) players.push(name);
-  localStorage.setItem('players', JSON.stringify(players));
-  input.value='';
-  alert('Jogador adicionado!');
+const input = document.getElementById('playerInput');
+const name = input.value.trim();
+if(!name) return;
+let players = JSON.parse(localStorage.getItem('players')) || [];
+if(!players.includes(name)) players.push(name);
+localStorage.setItem('players', JSON.stringify(players));
+input.value='';
+alert('Jogador adicionado!');
 }
 
 function renderPlayers(){
-  const players = JSON.parse(localStorage.getItem('players')) || [];
-  const ul=document.getElementById('playersList');
-  ul.innerHTML='';
-  players.forEach(n=>{
-    const li=document.createElement('li');
-    li.textContent=n;
-    ul.appendChild(li);
-  });
+const players = JSON.parse(localStorage.getItem('players')) || [];
+const ul=document.getElementById('playersList');
+ul.innerHTML='';
+players.forEach(n=>{
+const li=document.createElement('li');
+li.textContent=n;
+ul.appendChild(li);
+});
 }
 
 // PARTIDAS
@@ -217,13 +186,13 @@ function formatDate(d){ return d.toLocaleDateString('pt-BR'); }
 
 let d = new Date(startDate);
 while(d.getFullYear() === 2026){
-  const key = d.toISOString().split('T')[0];
-  if(!data[key]) data[key] = [{},{},{}];
-  const opt = document.createElement('option');
-  opt.value = key;
-  opt.textContent = formatDate(d);
-  select.appendChild(opt);
-  d.setDate(d.getDate()+7);
+const key = d.toISOString().split('T')[0];
+if(!data[key]) data[key] = [{},{},{}];
+const opt = document.createElement('option');
+opt.value = key;
+opt.textContent = formatDate(d);
+select.appendChild(opt);
+d.setDate(d.getDate()+7);
 }
 localStorage.setItem('pokerData',JSON.stringify(data));
 
@@ -232,56 +201,56 @@ select.selectedIndex = 0;
 renderGames();
 
 function renderGames(){
-  const dayKey = select.value;
-  gamesDiv.innerHTML='';
-  data[dayKey].forEach((match,i)=>{
-    const div = document.createElement('div');
-    div.className='day';
-    div.innerHTML = `
-      <strong>Partida ${i+1}</strong><br>
-      <input placeholder="1º Lugar" value="${match.win||''}" onchange="save('${dayKey}',${i},'win',this.value)">
-      <input placeholder="2º Lugar" value="${match.vice||''}" onchange="save('${dayKey}',${i},'vice',this.value)">
-    `;
-    gamesDiv.appendChild(div);
-  });
+const dayKey = select.value;
+gamesDiv.innerHTML='';
+data[dayKey].forEach((match,i)=>{
+const div = document.createElement('div');
+div.className='day';
+div.innerHTML = `
+<strong>Partida ${i+1}</strong><br>
+<input placeholder="1º Lugar" value="${match.win||''}" onchange="save('${dayKey}',${i},'win',this.value)">
+<input placeholder="2º Lugar" value="${match.vice||''}" onchange="save('${dayKey}',${i},'vice',this.value)">
+`;
+gamesDiv.appendChild(div);
+});
 }
 
 function save(day,i,type,value){
-  data[day][i][type]=value;
-  localStorage.setItem('pokerData',JSON.stringify(data));
+data[day][i][type]=value;
+localStorage.setItem('pokerData',JSON.stringify(data));
 }
 
 // RANKING
 function renderRanking(){
-  const stats={};
-  Object.values(data).forEach(day=>{
-    day.forEach(m=>{
-      if(m.win){ stats[m.win]=stats[m.win]||{w:0,v:0}; stats[m.win].w++; }
-      if(m.vice){ stats[m.vice]=stats[m.vice]||{w:0,v:0}; stats[m.vice].v++; }
-    });
-  });
+const stats={};
+Object.values(data).forEach(day=>{
+day.forEach(m=>{
+if(m.win){ stats[m.win]=stats[m.win]||{w:0,v:0}; stats[m.win].w++; }
+if(m.vice){ stats[m.vice]=stats[m.vice]||{w:0,v:0}; stats[m.vice].v++; }
+});
+});
 
-  const wins = Object.entries(stats).sort((a,b)=>b[1].w-a[1].w);
-  const vices = Object.entries(stats).sort((a,b)=>b[1].v-a[1].v);
+const wins = Object.entries(stats).sort((a,b)=>b[1].w-a[1].w);
+const vices = Object.entries(stats).sort((a,b)=>b[1].v-a[1].v);
 
-  document.getElementById('rankWins').innerHTML='';
-  document.getElementById('rankVices').innerHTML='';
+document.getElementById('rankWins').innerHTML='';
+document.getElementById('rankVices').innerHTML='';
 
-  wins.forEach(([n,s])=>{
-    if(s.w>0){
-      const li=document.createElement('li');
-      li.textContent=`${n} (${s.w})`;
-      document.getElementById('rankWins').appendChild(li);
-    }
-  });
+wins.forEach(([n,s])=>{
+if(s.w>0){
+const li=document.createElement('li');
+li.textContent=`${n} (${s.w})`;
+document.getElementById('rankWins').appendChild(li);
+}
+});
 
-  vices.forEach(([n,s])=>{
-    if(s.v>0){
-      const li=document.createElement('li');
-      li.textContent=`${n} (${s.v})`;
-      document.getElementById('rankVices').appendChild(li);
-    }
-  });
+vices.forEach(([n,s])=>{
+if(s.v>0){
+const li=document.createElement('li');
+li.textContent=`${n} (${s.v})`;
+document.getElementById('rankVices').appendChild(li);
+}
+});
 }
 </script>
 
