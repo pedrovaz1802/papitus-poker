@@ -257,6 +257,17 @@ function formatDate(d){
 }
 
 let data = JSON.parse(localStorage.getItem('pokerData')) || {};
+// REMOVE DATAS ANTIGAS AUTOMATICAMENTE
+const minDate = new Date(2026,1,9);
+
+Object.keys(data).forEach(key=>{
+  if(new Date(key) < minDate){
+    delete data[key];
+  }
+});
+
+localStorage.setItem('pokerData', JSON.stringify(data));
+
 // ===== DADOS INICIAIS PRÉ-CARREGADOS =====
 if(Object.keys(data).length === 0){
 
@@ -440,5 +451,6 @@ vices.forEach(([n,s])=>{
 
 </body>
 </html>
+
 
 
