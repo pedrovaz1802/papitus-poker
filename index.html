@@ -257,9 +257,38 @@ function formatDate(d){
 }
 
 let data = JSON.parse(localStorage.getItem('pokerData')) || {};
+// ===== DADOS INICIAIS PRÉ-CARREGADOS =====
+if(Object.keys(data).length === 0){
+
+  const presetStats = {
+    PAPITO: { w:9, v:3 },
+    SERGIO: { w:8, v:13 },
+    PEDRO: { w:7, v:5 },
+    ROBERTINHO: { w:6, v:6 },
+    MALA: { w:5, v:14 },
+    JOHNNY: { w:4, v:1 },
+    RAUL: { w:4, v:1 },
+    PARISIO: { w:1, v:1 }
+  };
+
+  const todayKey = new Date(2026,1,9).toISOString().split('T')[0];
+  data[todayKey] = [];
+
+  Object.entries(presetStats).forEach(([name,stats])=>{
+    for(let i=0;i<stats.w;i++){
+      data[todayKey].push({win:name});
+    }
+    for(let i=0;i<stats.v;i++){
+      data[todayKey].push({vice:name});
+    }
+  });
+
+  localStorage.setItem('pokerData', JSON.stringify(data));
+}
+
 
 // PARTIDAS
-const startDate = new Date(2025,09,6); // 03/11/2025
+const startDate = new Date(2025,1,9); 
 const endDate   = new Date(2026,11,31); // 31/12/2026
 
 let d = new Date(startDate);
@@ -411,4 +440,5 @@ vices.forEach(([n,s])=>{
 
 </body>
 </html>
+
 
