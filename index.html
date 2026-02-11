@@ -248,9 +248,15 @@ function renderGames(){
   const dayKey = select.value;
 
   if (!data[dayKey]) {
-    data[dayKey] = [{},{},{}];
-    localStorage.setItem('pokerData', JSON.stringify(data));
-  }
+  data[dayKey] = [];
+}
+
+// garante sempre 3 partidas
+while (data[dayKey].length < 3) {
+  data[dayKey].push({});
+}
+
+localStorage.setItem('pokerData', JSON.stringify(data));
 
   gamesDiv.innerHTML='';
   data[dayKey].forEach((match,i)=>{
