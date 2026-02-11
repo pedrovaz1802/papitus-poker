@@ -39,6 +39,41 @@ margin:0 auto;
 }
 .day { border:1px solid rgba(255,255,255,.3); padding:15px; margin-top:15px; border-radius:12px; }
 strong { color:#ffd966; }
+/* ===== PÓDIO ===== */
+
+.podium {
+  display:flex;
+  justify-content:center;
+  align-items:flex-end;
+  gap:15px;
+  margin-bottom:30px;
+}
+
+.podium .place {
+  text-align:center;
+  background:linear-gradient(to top,#ffd966,#fff2b3);
+  color:#000;
+  border-radius:10px 10px 0 0;
+  padding:10px;
+  width:110px;
+  font-weight:bold;
+  box-shadow:0 4px 10px rgba(0,0,0,.4);
+  transition:.3s;
+}
+
+.podium .place:hover {
+  transform:translateY(-5px);
+}
+
+.first  { height:160px; }
+.second { height:130px; }
+.third  { height:110px; }
+
+.place span {
+  display:block;
+  margin-top:8px;
+  font-size:14px;
+}
 </style>
 </head>
 
@@ -143,7 +178,11 @@ if (key === "pokerData") db.ref("pokerData").set(parsed);
 <h1>RANKING DE LÍDERES</h1>
 <div class="table">
 <h3>🏆 Mais Vitórias</h3>
+
+<div id="podium" class="podium"></div>
+
 <ol id="rankWins"></ol>
+
 <h3>🥈 Mais Vices</h3>
 <ol id="rankVices"></ol>
 </div>
@@ -282,37 +321,94 @@ function save(day, i, type, value){
 
 // RANKING
 function renderRanking(){
+
 const stats={};
+
 Object.values(data).forEach(day=>{
-day.forEach(m=>{
-if(m.win){ stats[m.win]=stats[m.win]||{w:0,v:0}; stats[m.win].w++; }
-if(m.vice){ stats[m.vice]=stats[m.vice]||{w:0,v:0}; stats[m.vice].v++; }
-});
+  day.forEach(m=>{
+    if(m.win){
+      stats[m.win]=stats[m.win]||{w:0,v:0};
+      stats[m.win].w++;
+    }
+    if(m.vice){
+      stats[m.vice]=stats[m.vice]||{w:0,v:0};
+      stats[m.vice].v++;
+    }
+  });
 });
 
 const wins = Object.entries(stats).sort((a,b)=>b[1].w-a[1].w);
 const vices = Object.entries(stats).sort((a,b)=>b[1].v-a[1].v);
 
-document.getElementById('rankWins').innerHTML='';
-document.getElementById('rankVices').innerHTML='';
+const podiumDiv = document.getElementById('podium');
+const rankWinsList = document.getElementById('rankWins');
+const rankVicesList = document.getElementById('rankVices');
 
-wins.forEach(([n,s])=>{
-if(s.w>0){
-const li=document.createElement('li');
-li.textContent=`${n} (${s.w})`;
-document.getElementById('rankWins').appendChild(li);
+podiumDiv.innerHTML='';
+rankWinsList.innerHTML='';
+rankVicesList.innerHTML='';
+
+/* ========= PÓDIO (TOP 3 VITÓRIAS) ========= */
+
+if(wins.length > 0){
+
+  const top3 = wins.slice(0,3);
+
+  // ordem visual: 2º | 1º | 3º
+  const order = [1,0,2];
+
+  order.forEach(pos=>{
+    if(top3[pos] && top3[pos][1].w > 0){
+
+      const [name, stats] = top3[pos];
+
+      const div = document.createElement('div');
+      div.classList.add('place');
+
+      if(pos === 0) div.classList.add('first');
+      if(pos === 1) div.classList.add('second');
+      if(pos === 2) div.classList.add('third');
+
+      const medal =
+        pos === 0 ? "🥇" :
+        pos === 1 ? "🥈" :
+        "🥉";
+
+      div.innerHTML = `
+        ${medal}
+        <span>${name}</span>
+        <span>${stats.w} vitórias</span>
+      `;
+
+      podiumDiv.appendChild(div);
+    }
+  });
+
+  // RESTANTE (4º em diante)
+  wins.slice(3).forEach(([n,s],index)=>{
+    if(s.w>0){
+      const li=document.createElement('li');
+      li.textContent=`${index+4}º ${n} (${s.w})`;
+      rankWinsList.appendChild(li);
+    }
+  });
+
 }
-});
+
+/* ========= VICES (SEM ALTERAÇÃO VISUAL) ========= */
 
 vices.forEach(([n,s])=>{
-if(s.v>0){
-const li=document.createElement('li');
-li.textContent=`${n} (${s.v})`;
-document.getElementById('rankVices').appendChild(li);
-}
+  if(s.v>0){
+    const li=document.createElement('li');
+    li.textContent=`${n} (${s.v})`;
+    rankVicesList.appendChild(li);
+  }
 });
+
 }
+
 </script>
 
 </body>
 </html>
+
