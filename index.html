@@ -64,6 +64,9 @@ const db = firebase.database();
 </script>
 
 <script>
+let isTyping = false;
+
+
 window.addEventListener("load", () => {
 
 /* ====== SINCRONIZAÇÃO FIREBASE ↔ SITE ====== */
@@ -147,7 +150,6 @@ if (key === "pokerData") db.ref("pokerData").set(parsed);
 </div>
 
 <script>
-  let isTyping = false;
 // navegação
 const pages = document.querySelectorAll('.page');
 function showPage(id){
@@ -258,25 +260,18 @@ div.innerHTML = `
 <strong>Partida ${i+1}</strong><br>
 <input placeholder="1º Lugar"
   value="${match.win||''}"
-  oninput="save('${dayKey}',${i},'win',this.value)">
+  onblur="save('${dayKey}',${i},'win',this.value)">
 <input placeholder="2º Lugar"
   value="${match.vice||''}"
-  oninput="save('${dayKey}',${i},'vice',this.value)">
+  onblur="save('${dayKey}',${i},'vice',this.value)">
 `;
 gamesDiv.appendChild(div);
 });
 }
 
 function save(day, i, type, value){
-  isTyping = true;
-
   data[day][i][type] = value;
   localStorage.setItem('pokerData', JSON.stringify(data));
-
-  clearTimeout(window.typingTimer);
-  window.typingTimer = setTimeout(() => {
-    isTyping = false;
-  }, 600);
 }
 
 // RANKING
